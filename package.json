@@ -10,15 +10,18 @@
     "package.json",
     "dist"
   ],
+  "scripts": {
+    "build": "vite build && tsc"
+  },
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/core/index.d.ts",
-        "default": "./dist/core/index.mjs"
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
       },
       "require": {
-        "types": "./dist/core/index.d.ts",
-        "default": "./dist/core/index.cjs"
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.cjs"
       }
     },
     "./react": {
@@ -41,26 +44,36 @@
         "default": "./dist/providers/mixpanel/index.cjs"
       }
     },
-    "./providers/ga3": {
+    "./providers/google-analytics": {
       "import": {
-        "types": "./dist/providers/mixpanel/index.d.ts",
-        "default": "./dist/providers/mixpanel/index.mjs"
+        "types": "./dist/providers/google-analytics/index.d.ts",
+        "default": "./dist/providers/google-analytics/index.mjs"
       },
       "require": {
-        "types": "./dist/providers/mixpanel/index.d.ts",
-        "default": "./dist/providers/mixpanel/index.cjs"
+        "types": "./dist/providers/google-analytics/index.d.ts",
+        "default": "./dist/providers/google-analytics/index.cjs"
       }
     }
   },
   "packageManager": "yarn@3.4.1",
   "devDependencies": {
+    "@types/react": "^18.0.27",
     "@vitest/ui": "^0.28.4",
+    "happy-dom": "^8.2.6",
+    "react": "^18.2.0",
     "typescript": "^4.9.5",
     "vite": "^4.1.1",
-    "vite-plugin-dts": "^1.7.2",
     "vitest": "^0.28.4"
   },
   "dependencies": {
     "type-fest": "^3.5.6"
+  },
+  "peerDependencies": {
+    "react": "^17 || ^18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
   }
 }

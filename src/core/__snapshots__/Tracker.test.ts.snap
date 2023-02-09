@@ -1,0 +1,206 @@
+// Vitest Snapshot v1
+
+exports[`init > should keep provider if isReady resolved in 3s 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      "test",
+      {
+        "foo": "bar",
+      },
+      {
+        "properties": {
+          "foo": "bar",
+        },
+      },
+      {},
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`init > should keep provider if isReady resolved in 3s 2`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      "test",
+      {
+        "foo": "bar",
+      },
+      {
+        "properties": {
+          "foo": "bar",
+        },
+      },
+      {},
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`init > should remove provider if isReady throw error 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      "test",
+      {
+        "foo": "bar",
+      },
+      {
+        "properties": {
+          "foo": "bar",
+        },
+      },
+      {},
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`init > should remove provider if isReady timeout (3s) 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      "test",
+      {
+        "foo": "bar",
+      },
+      {
+        "properties": {
+          "foo": "bar",
+        },
+      },
+      {},
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`init > should remove provider if isReady timeout (3s) 2`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      "test",
+      {
+        "foo": "bar",
+      },
+      {
+        "properties": {
+          "foo": "bar",
+        },
+      },
+      {},
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`init > should throw error if provider name is not unique 1`] = `"Provider name \\"bar\\" is already in use. Provider names must be unique."`;
+
+exports[`track > should call every providers' track methods 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      "test",
+      {
+        "foo": "bar",
+      },
+      {
+        "properties": {
+          "foo": "bar",
+        },
+      },
+      {},
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`track > should call every providers' track methods 2`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      "test",
+      {
+        "foo": "bar",
+      },
+      {
+        "properties": {
+          "foo": "bar",
+        },
+      },
+      {},
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;
+
+exports[`track > should not call track method of provider which not specified in trackerOptions.includes 1`] = `
+[MockFunction spy] {
+  "calls": [
+    [
+      "test",
+      {
+        "foo": "bar",
+      },
+      {
+        "includes": {
+          "bar": true,
+        },
+        "properties": {
+          "foo": "bar",
+        },
+      },
+      {},
+    ],
+  ],
+  "results": [
+    {
+      "type": "return",
+      "value": undefined,
+    },
+  ],
+}
+`;

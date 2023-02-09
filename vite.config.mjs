@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite';
-import dts from 'vite-plugin-dts';
 
 export default defineConfig({
   build: {
@@ -8,8 +7,7 @@ export default defineConfig({
         'src/index.ts',
         'src/react/index.ts',
         'src/providers/mixpanel/index.ts',
-        'src/providers/ga3/index.ts',
-        'src/providers/custom/index.ts',
+        'src/providers/google-analytics/index.ts',
       ],
       formats: ['cjs', 'es'],
       fileName(format, entryName) {
@@ -30,7 +28,7 @@ export default defineConfig({
     },
     sourcemap: true,
   },
-  plugins: [
-    dts(),
-  ],
+  test: {
+    environment: 'happy-dom',
+  },
 });

@@ -26,7 +26,7 @@ const setup = () => {
   const mockProviders: Record<'foo' | 'bar', IProvider> = {
     foo: {
       name: fooProviderName,
-      init: vi.fn(() => true),
+      init: vi.fn(() => {}),
       onIdentify: vi.fn(),
       onMerge: vi.fn(),
       onUpdateUserProperties: vi.fn(),
@@ -34,7 +34,7 @@ const setup = () => {
     },
     bar: {
       name: barProviderName,
-      init: vi.fn(() => true),
+      init: vi.fn(() => {}),
       onIdentify: vi.fn(),
       onMerge: vi.fn(),
       onUpdateUserProperties: vi.fn(),
@@ -61,23 +61,55 @@ describe('init', () => {
     expect(mockProvider.bar.init).toHaveBeenCalled();
   });
 
-  it('should remove provider if isReady return false', async () => {
+  it('should throw error if provider name is not unique', () => {
+    const { createTracker, mockProvider } = setup();
+
+    mockProvider.foo.name = 'bar';
+
+    expect(createTracker).toThrowErrorMatchingInlineSnapshot(
+      '"Provider name \\"bar\\" is already in use. Provider names must be unique."',
+    );
+  });
+
+  it('should remove provider if isReady timeout (3s)', async () => {
     const { createTracker, mockProvider } = setup();
 
     (mockProvider.foo.init as unknown as SpyInstance)
-      .mockReturnValue(false);
+      .mockImplementation(() => new Promise(resolve => setTimeout(resolve, 3001)));
 
     const tracker = createTracker();
-    tracker.onTrack('test', {
+    await vi.advanceTimersByTimeAsync(3000);
+
+    tracker.track('test', {
       properties: { foo: 'bar' },
     });
     await vi.runOnlyPendingTimersAsync();
 
     expect(mockProvider.foo.onTrack).toHaveBeenCalledTimes(0);
+
     expect(mockProvider.bar.onTrack).toHaveBeenCalledTimes(1);
-    expect(mockProvider.bar.onTrack).toHaveBeenCalledWith('test', {
+    expect(mockProvider.bar.onTrack).toMatchSnapshot();
+  });
+
+  it('should keep provider if isReady resolved in 3s', async () => {
+    const { createTracker, mockProvider } = setup();
+
+    (mockProvider.foo.init as unknown as SpyInstance)
+      .mockImplementation(() => new Promise(resolve => setTimeout(resolve, 2999)));
+
+    const tracker = createTracker();
+    await vi.advanceTimersByTimeAsync(3000);
+
+    tracker.track('test', {
       properties: { foo: 'bar' },
     });
+    await vi.runOnlyPendingTimersAsync();
+
+    expect(mockProvider.foo.onTrack).toHaveBeenCalledTimes(1);
+    expect(mockProvider.foo.onTrack).toMatchSnapshot();
+
+    expect(mockProvider.bar.onTrack).toHaveBeenCalledTimes(1);
+    expect(mockProvider.bar.onTrack).toMatchSnapshot();
   });
 
   it('should remove provider if isReady throw error', async () => {
@@ -87,39 +119,38 @@ describe('init', () => {
       .mockRejectedValue(new Error('Unknown Error.'));
 
     const tracker = createTracker();
-    tracker.onTrack('test', {
+    tracker.track('test', {
       properties: { foo: 'bar' },
     });
     await vi.runOnlyPendingTimersAsync();
 
     expect(mockProvider.foo.onTrack).toHaveBeenCalledTimes(0);
+
     expect(mockProvider.bar.onTrack).toHaveBeenCalledTimes(1);
-    expect(mockProvider.bar.onTrack).toHaveBeenCalledWith('test', {
-      properties: { foo: 'bar' },
-    });
+    expect(mockProvider.bar.onTrack).toMatchSnapshot();
   });
 
   it("should call providers' isReady once", async () => {
     const { createTracker, mockProvider } = setup();
 
     const tracker = createTracker();
-    tracker.onTrack('test', {});
+    tracker.track('test', {});
     await vi.runAllTimersAsync();
 
     expect(mockProvider.foo.init).toHaveBeenCalledTimes(1);
-    expect(mockProvider.bar.onTrack).toHaveBeenCalledTimes(1);
+    expect(mockProvider.foo.onTrack).toHaveBeenCalledTimes(1);
 
-    tracker.onTrack('test', {});
+    tracker.track('test', {});
     await vi.runAllTimersAsync();
 
     expect(mockProvider.foo.init).toHaveBeenCalledTimes(1);
-    expect(mockProvider.bar.onTrack).toHaveBeenCalledTimes(2);
+    expect(mockProvider.foo.onTrack).toHaveBeenCalledTimes(2);
 
-    tracker.onTrack('test', {});
+    tracker.track('test', {});
     await vi.runAllTimersAsync();
 
     expect(mockProvider.foo.init).toHaveBeenCalledTimes(1);
-    expect(mockProvider.bar.onTrack).toHaveBeenCalledTimes(3);
+    expect(mockProvider.foo.onTrack).toHaveBeenCalledTimes(3);
   });
 });
 
@@ -129,27 +160,24 @@ describe('track', () => {
 
     const tracker = createTracker();
 
-    tracker.onTrack('test', {
+    tracker.track('test', {
       properties: { foo: 'bar' },
     });
 
     await vi.runAllTimersAsync();
 
     expect(mockProvider.foo.onTrack).toHaveBeenCalledTimes(1);
-    expect(mockProvider.foo.onTrack).toHaveBeenCalledWith('test', {
-      properties: { foo: 'bar' },
-    });
+    expect(mockProvider.foo.onTrack).toMatchSnapshot();
+
     expect(mockProvider.bar.onTrack).toHaveBeenCalledTimes(1);
-    expect(mockProvider.bar.onTrack).toHaveBeenCalledWith('test', {
-      properties: { foo: 'bar' },
-    });
+    expect(mockProvider.bar.onTrack).toMatchSnapshot();
   });
 
   it('should not call track method of provider which not specified in trackerOptions.includes', async () => {
     const { createTracker, mockProvider } = setup();
 
     const tracker = createTracker();
-    tracker.onTrack('test', {
+    tracker.track('test', {
       properties: { foo: 'bar' },
       includes: { bar: true },
     });
@@ -157,10 +185,8 @@ describe('track', () => {
     await vi.runAllTimersAsync();
 
     expect(mockProvider.foo.onTrack).toHaveBeenCalledTimes(0);
+
     expect(mockProvider.bar.onTrack).toHaveBeenCalledTimes(1);
-    expect(mockProvider.bar.onTrack).toHaveBeenCalledWith('test', {
-      properties: { foo: 'bar' },
-      includes: { bar: true },
-    });
+    expect(mockProvider.bar.onTrack).toMatchSnapshot();
   });
 });

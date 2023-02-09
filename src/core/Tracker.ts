@@ -31,7 +31,14 @@ export class Tracker implements ITracker {
           setTimeout(reject, 3000, `Provider ${provider.name} is timeout during initalize.`)
         ),
       ]).catch((rejected) => {
-        // Log reason
+        const message: string = typeof rejected === 'string'
+          ? `Reason: ${rejected}`
+          : rejected instanceof Error
+          ? `Caused by:\n  ${rejected.stack}`
+          : `Unknown: ${rejected}`;
+
+        console.error(`Provider ${provider.name} is not initialized. ${message}`);
+
         this.#providers.delete(provider.name);
       });
 
@@ -41,7 +48,7 @@ export class Tracker implements ITracker {
     await Promise.all(initPromises);
   }
 
-  private filterProviders(trackOptions: TrackOptions) {
+  private filterProviders(trackOptions: TrackOptions<any, any>) {
     if (trackOptions.includes && trackOptions.excludes) {
       throw new Error('Cannot set both "includes" and "excludes" options. Choose one or none.');
     }
@@ -56,7 +63,7 @@ export class Tracker implements ITracker {
         .filter(provider => !trackOptions.excludes![provider.name as TrackerProviderName]);
     }
 
-    return this.#providers;
+    return Array.from(this.#providers.values());
   }
 
   track = <
