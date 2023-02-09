@@ -6,3 +6,5 @@
 !.yarn/versions
 !.yarn/cache
 dist
+
+node_modules
