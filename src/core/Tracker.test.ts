@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, SpyInstance, vi } from 'vitest';
-import { IProvider } from '../interface.js';
+import { IProvider } from './interface.js';
 import { Tracker } from './Tracker.js';
 
 const fooProviderName = 'foo' as const;
@@ -28,7 +28,6 @@ const setup = () => {
       name: fooProviderName,
       init: vi.fn(() => {}),
       onIdentify: vi.fn(),
-      onMerge: vi.fn(),
       onUpdateUserProperties: vi.fn(),
       onTrack: vi.fn(),
     },
@@ -36,7 +35,6 @@ const setup = () => {
       name: barProviderName,
       init: vi.fn(() => {}),
       onIdentify: vi.fn(),
-      onMerge: vi.fn(),
       onUpdateUserProperties: vi.fn(),
       onTrack: vi.fn(),
     },

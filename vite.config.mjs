@@ -4,10 +4,10 @@ export default defineConfig({
   build: {
     lib: {
       entry: [
-        'src/index.ts',
+        'src/core/index.ts',
         'src/react/index.ts',
         'src/providers/mixpanel/index.ts',
-        'src/providers/google-analytics/index.ts',
+        'src/providers/ga4/index.ts',
       ],
       formats: ['cjs', 'es'],
       fileName(format, entryName) {
@@ -18,8 +18,10 @@ export default defineConfig({
     },
     outDir: 'dist',
     rollupOptions: {
-      external: id => {
-        return !id.startsWith('\0') && !id.startsWith('.') && !id.startsWith('/');
+      external: (id) => {
+        return (
+          !id.startsWith('\0') && !id.startsWith('.') && !id.startsWith('/')
+        );
       },
       output: {
         preserveModules: true,

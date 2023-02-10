@@ -16,12 +16,12 @@
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.mjs"
+        "types": "./dist/core/index.d.ts",
+        "default": "./dist/core/index.mjs"
       },
       "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.cjs"
+        "types": "./dist/core/index.d.ts",
+        "default": "./dist/core/index.cjs"
       }
     },
     "./react": {
@@ -44,14 +44,14 @@
         "default": "./dist/providers/mixpanel/index.cjs"
       }
     },
-    "./providers/google-analytics": {
+    "./providers/ga4": {
       "import": {
-        "types": "./dist/providers/google-analytics/index.d.ts",
-        "default": "./dist/providers/google-analytics/index.mjs"
+        "types": "./dist/providers/ga4/index.d.ts",
+        "default": "./dist/providers/ga4/index.mjs"
       },
       "require": {
-        "types": "./dist/providers/google-analytics/index.d.ts",
-        "default": "./dist/providers/google-analytics/index.cjs"
+        "types": "./dist/providers/ga4/index.d.ts",
+        "default": "./dist/providers/ga4/index.cjs"
       }
     }
   },

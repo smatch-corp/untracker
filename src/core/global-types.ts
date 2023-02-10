@@ -1,7 +1,6 @@
 declare global {
   export namespace TrackerTypes {
     export interface TrackerProviders {
-      googleAnalytics: true;
     }
 
     export interface TrackerContext {
@@ -12,7 +11,13 @@ declare global {
       SessionProperties extends Record<string, any> = {},
     > {
     }
+
+    export interface IdentifyOptions {
+    }
+
+    export interface UpdateUserPropertiesOptions<
+      UserProperties extends Record<string, any> = {},
+    > {
+    }
   }
 }
-
-export {};

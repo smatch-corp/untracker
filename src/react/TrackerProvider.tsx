@@ -1,5 +1,5 @@
 import { createContext, FC, ReactNode, useContext } from 'react';
-import { ITracker } from '../interface.js';
+import { ITracker } from '../core/interface.js';
 
 const TrackerContext = createContext<ITracker>(null as never);
 

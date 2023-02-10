@@ -6,6 +6,9 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "editor.formatOnSave": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "dprint.dprint"
+  },
   "[typescript]": {
     "editor.defaultFormatter": "dprint.dprint"
   },

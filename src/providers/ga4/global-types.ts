@@ -9,6 +9,7 @@ declare global {
 
   export namespace TrackerTypes {
     export interface TrackerProviders {
+      ga4: true;
     }
 
     export interface TrackerContext {
@@ -18,7 +19,7 @@ declare global {
       EventProperties extends Record<string, any> = {},
       SessionProperties extends Record<string, any> = {},
     > {
-      googleAnalytics?: {
+      ga4?: {
         eventCategoryKey?: keyof (EventProperties & SessionProperties);
         eventLabelKey?: keyof (EventProperties & SessionProperties);
         eventValueKey?: ConditionalKeys<EventProperties & SessionProperties, number>;

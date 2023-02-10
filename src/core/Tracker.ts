@@ -1,4 +1,12 @@
-import { IProvider, ITracker, TrackerProviderName, TrackOptions } from '../interface.js';
+import {
+  IdentifyOptions,
+  IProvider,
+  ITracker,
+  Options,
+  TrackerProviderName,
+  TrackOptions,
+  UpdateUserPropertiesOptions,
+} from './interface.js';
 
 export interface TrackerOptions {
   providers: IProvider[];
@@ -48,52 +56,58 @@ export class Tracker implements ITracker {
     await Promise.all(initPromises);
   }
 
-  private filterProviders(trackOptions: TrackOptions<any, any>) {
+  private filterProviders(trackOptions: Options) {
     if (trackOptions.includes && trackOptions.excludes) {
       throw new Error('Cannot set both "includes" and "excludes" options. Choose one or none.');
     }
 
+    const providers = Array.from(this.#providers.values());
+
     if (trackOptions.includes) {
-      return Array.from(this.#providers.values())
-        .filter(provider => !!trackOptions.includes![provider.name as TrackerProviderName]);
+      return providers.filter(
+        provider => !!trackOptions.includes![provider.name as TrackerProviderName],
+      );
     }
 
     if (trackOptions.excludes) {
-      return Array.from(this.#providers.values())
-        .filter(provider => !trackOptions.excludes![provider.name as TrackerProviderName]);
+      return providers.filter(
+        provider => !trackOptions.excludes![provider.name as TrackerProviderName],
+      );
     }
 
-    return Array.from(this.#providers.values());
+    return providers;
   }
 
   track = <
     EventName extends string = string,
     EventProperties extends Record<string, any> = {},
     SessionProperties extends Record<string, any> = {},
-  >(eventName: EventName, trackOptions: TrackOptions<EventProperties, SessionProperties>) => {
+  >(eventName: EventName, options: TrackOptions<EventProperties, SessionProperties> = {}) => {
     this.#initialized.then(() => {
-      const trackers = this.filterProviders(trackOptions);
+      const trackers = this.filterProviders(options);
+
+      // TODO: get or store session properties
+      const sessionProperties = {} as SessionProperties;
 
       const eventProperties = {
-        ...trackOptions.sessionProperties,
-        ...trackOptions.properties,
+        ...sessionProperties,
+        ...options.properties,
       } as EventProperties & SessionProperties;
 
       trackers.forEach(provider => {
-        provider.onTrack(eventName, eventProperties, trackOptions, {});
+        provider.onTrack(eventName, eventProperties, options, {});
       });
     });
   };
 
-  onMerge(): void {
+  identify = (id: string, options: IdentifyOptions = {}) => {
     throw new Error('Method not implemented.');
-  }
+  };
 
-  onIdentify(): void {
+  updateUserProperties = <UserProperties extends Record<string, any> = {}>(
+    userProperties: UserProperties,
+    options: UpdateUserPropertiesOptions = {},
+  ) => {
     throw new Error('Method not implemented.');
-  }
-
-  onUpdateUserProperties(): void {
-    throw new Error('Method not implemented.');
-  }
+  };
 }
