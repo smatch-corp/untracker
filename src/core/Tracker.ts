@@ -15,6 +15,7 @@ export interface TrackerOptions {
 export class Tracker implements ITracker {
   #providers: Map<string, IProvider>;
   #initialized: Promise<void>;
+  #sessionProperties: Record<string, any> = {};
 
   constructor(options: TrackerOptions) {
     this.#providers = new Map();

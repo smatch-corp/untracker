@@ -187,4 +187,7 @@ describe('track', () => {
     expect(mockProvider.bar.onTrack).toHaveBeenCalledTimes(1);
     expect(mockProvider.bar.onTrack).toMatchSnapshot();
   });
+
+  describe.skip('sessionProperties', () => {
+  });
 });
