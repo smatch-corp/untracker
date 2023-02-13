@@ -26,7 +26,7 @@ export interface UpdateUserPropertiesOptions<
 export interface IProvider {
   name: string;
 
-  init(): void | Promise<void>;
+  init: () => void | Promise<void>;
 
   onTrack: <
     EventProperties extends Record<string, any> = {},

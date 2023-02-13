@@ -63,7 +63,8 @@
     "react": "^18.2.0",
     "typescript": "^4.9.5",
     "vite": "^4.1.1",
-    "vitest": "^0.28.4"
+    "vitest": "^0.28.4",
+    "vitest-mock-extended": "^1.0.9"
   },
   "dependencies": {
     "type-fest": "^3.5.6"

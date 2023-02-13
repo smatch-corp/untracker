@@ -1,4 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it, Mock, SpyInstance, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { mock } from 'vitest-mock-extended';
 import { IProvider } from './interface.js';
 import { Tracker } from './Tracker.js';
 
@@ -23,57 +24,44 @@ afterEach(() => {
 });
 
 const setup = () => {
-  const mockProviders: Record<'foo' | 'bar', IProvider> = {
-    foo: {
-      name: fooProviderName,
-      init: vi.fn(() => {}),
-      onIdentify: vi.fn(),
-      onUpdateUserProperties: vi.fn(),
-      onTrack: vi.fn(),
-    },
-    bar: {
-      name: barProviderName,
-      init: vi.fn(() => {}),
-      onIdentify: vi.fn(),
-      onUpdateUserProperties: vi.fn(),
-      onTrack: vi.fn(),
-    },
+  const provider = mock<IProvider>({
+    name: 'foo',
+  });
+
+  const createTracker = (providers: IProvider[] = [provider]) => {
+    return new Tracker({ providers });
   };
 
-  const createTracker = () => {
-    return new Tracker({
-      providers: [mockProviders.foo, mockProviders.bar],
-    });
-  };
-
-  return { createTracker, mockProvider: mockProviders };
+  return { createTracker, provider };
 };
 
 describe('init', () => {
   it("should call every providers' isReady methods", () => {
-    const { createTracker, mockProvider } = setup();
+    const { createTracker, provider } = setup();
 
     createTracker();
 
-    expect(mockProvider.foo.init).toHaveBeenCalled();
-    expect(mockProvider.bar.init).toHaveBeenCalled();
+    expect(provider.init).toHaveBeenCalled();
   });
 
   it('should throw error if provider name is not unique', () => {
-    const { createTracker, mockProvider } = setup();
+    const { createTracker, provider } = setup();
 
-    mockProvider.foo.name = 'bar';
+    const duplicatedProvider = mock<IProvider>({
+      name: provider.name,
+    });
 
-    expect(createTracker).toThrowErrorMatchingInlineSnapshot(
-      '"Provider name \\"bar\\" is already in use. Provider names must be unique."',
+    expect(() => createTracker([provider, duplicatedProvider])).toThrowErrorMatchingInlineSnapshot(
+      '"Provider name \\"foo\\" is already in use. Provider names must be unique."',
     );
   });
 
   it('should remove provider if isReady timeout (3s)', async () => {
-    const { createTracker, mockProvider } = setup();
+    const { createTracker, provider } = setup();
 
-    (mockProvider.foo.init as unknown as SpyInstance)
-      .mockImplementation(() => new Promise(resolve => setTimeout(resolve, 3001)));
+    provider.init.mockImplementation(
+      () => new Promise(resolve => setTimeout(resolve, 3001)),
+    );
 
     const tracker = createTracker();
     await vi.advanceTimersByTimeAsync(3000);
@@ -83,17 +71,15 @@ describe('init', () => {
     });
     await vi.runOnlyPendingTimersAsync();
 
-    expect(mockProvider.foo.onTrack).toHaveBeenCalledTimes(0);
-
-    expect(mockProvider.bar.onTrack).toHaveBeenCalledTimes(1);
-    expect(mockProvider.bar.onTrack).toMatchSnapshot();
+    expect(provider.onTrack).toHaveBeenCalledTimes(0);
   });
 
   it('should keep provider if isReady resolved in 3s', async () => {
-    const { createTracker, mockProvider } = setup();
+    const { createTracker, provider } = setup();
 
-    (mockProvider.foo.init as unknown as SpyInstance)
-      .mockImplementation(() => new Promise(resolve => setTimeout(resolve, 2999)));
+    provider.init.mockImplementation(
+      () => new Promise(resolve => setTimeout(resolve, 2999)),
+    );
 
     const tracker = createTracker();
     await vi.advanceTimersByTimeAsync(3000);
@@ -103,18 +89,27 @@ describe('init', () => {
     });
     await vi.runOnlyPendingTimersAsync();
 
-    expect(mockProvider.foo.onTrack).toHaveBeenCalledTimes(1);
-    expect(mockProvider.foo.onTrack).toMatchSnapshot();
-
-    expect(mockProvider.bar.onTrack).toHaveBeenCalledTimes(1);
-    expect(mockProvider.bar.onTrack).toMatchSnapshot();
+    expect(provider.onTrack).toHaveBeenCalledTimes(1);
+    expect(provider.onTrack.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        "test",
+        {
+          "foo": "bar",
+        },
+        {
+          "properties": {
+            "foo": "bar",
+          },
+        },
+        {},
+      ]
+    `);
   });
 
   it('should remove provider if isReady throw error', async () => {
-    const { createTracker, mockProvider } = setup();
+    const { createTracker, provider } = setup();
 
-    (mockProvider.foo.init as unknown as SpyInstance)
-      .mockRejectedValue(new Error('Unknown Error.'));
+    provider.init.mockRejectedValue(new Error('Unknown Error.'));
 
     const tracker = createTracker();
     tracker.track('test', {
@@ -122,41 +117,32 @@ describe('init', () => {
     });
     await vi.runOnlyPendingTimersAsync();
 
-    expect(mockProvider.foo.onTrack).toHaveBeenCalledTimes(0);
-
-    expect(mockProvider.bar.onTrack).toHaveBeenCalledTimes(1);
-    expect(mockProvider.bar.onTrack).toMatchSnapshot();
+    expect(provider.onTrack).toHaveBeenCalledTimes(0);
   });
 
   it("should call providers' isReady once", async () => {
-    const { createTracker, mockProvider } = setup();
+    const { createTracker, provider } = setup();
 
     const tracker = createTracker();
     tracker.track('test', {});
-    await vi.runAllTimersAsync();
-
-    expect(mockProvider.foo.init).toHaveBeenCalledTimes(1);
-    expect(mockProvider.foo.onTrack).toHaveBeenCalledTimes(1);
-
     tracker.track('test', {});
-    await vi.runAllTimersAsync();
-
-    expect(mockProvider.foo.init).toHaveBeenCalledTimes(1);
-    expect(mockProvider.foo.onTrack).toHaveBeenCalledTimes(2);
-
     tracker.track('test', {});
+
     await vi.runAllTimersAsync();
 
-    expect(mockProvider.foo.init).toHaveBeenCalledTimes(1);
-    expect(mockProvider.foo.onTrack).toHaveBeenCalledTimes(3);
+    expect(provider.init).toHaveBeenCalledTimes(1);
+    expect(provider.onTrack).toHaveBeenCalledTimes(3);
   });
 });
 
 describe('track', () => {
   it("should call every providers' track methods", async () => {
-    const { createTracker, mockProvider } = setup();
+    const { createTracker, provider } = setup();
+    const yetAnotherProvider = mock<IProvider>({
+      name: 'yetAnotherProvider',
+    });
 
-    const tracker = createTracker();
+    const tracker = createTracker([provider, yetAnotherProvider]);
 
     tracker.track('test', {
       properties: { foo: 'bar' },
@@ -164,17 +150,46 @@ describe('track', () => {
 
     await vi.runAllTimersAsync();
 
-    expect(mockProvider.foo.onTrack).toHaveBeenCalledTimes(1);
-    expect(mockProvider.foo.onTrack).toMatchSnapshot();
+    expect(provider.onTrack).toHaveBeenCalledTimes(1);
+    expect(provider.onTrack.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        "test",
+        {
+          "foo": "bar",
+        },
+        {
+          "properties": {
+            "foo": "bar",
+          },
+        },
+        {},
+      ]
+    `);
 
-    expect(mockProvider.bar.onTrack).toHaveBeenCalledTimes(1);
-    expect(mockProvider.bar.onTrack).toMatchSnapshot();
+    expect(yetAnotherProvider.onTrack).toHaveBeenCalledTimes(1);
+    expect(yetAnotherProvider.onTrack.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        "test",
+        {
+          "foo": "bar",
+        },
+        {
+          "properties": {
+            "foo": "bar",
+          },
+        },
+        {},
+      ]
+    `);
   });
 
   it('should not call track method of provider which not specified in trackerOptions.includes', async () => {
-    const { createTracker, mockProvider } = setup();
+    const { createTracker, provider: fooProvider } = setup();
+    const barProvider = mock<IProvider>({
+      name: 'bar',
+    });
 
-    const tracker = createTracker();
+    const tracker = createTracker([fooProvider, barProvider]);
     tracker.track('test', {
       properties: { foo: 'bar' },
       includes: { bar: true },
@@ -182,15 +197,68 @@ describe('track', () => {
 
     await vi.runAllTimersAsync();
 
-    expect(mockProvider.foo.onTrack).toHaveBeenCalledTimes(0);
+    expect(fooProvider.onTrack).toHaveBeenCalledTimes(0);
 
-    expect(mockProvider.bar.onTrack).toHaveBeenCalledTimes(1);
-    expect(mockProvider.bar.onTrack).toMatchSnapshot();
+    expect(barProvider.onTrack).toHaveBeenCalledTimes(1);
+    expect(barProvider.onTrack.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        "test",
+        {
+          "foo": "bar",
+        },
+        {
+          "includes": {
+            "bar": true,
+          },
+          "properties": {
+            "foo": "bar",
+          },
+        },
+        {},
+      ]
+    `);
+  });
+
+  it('should not call track method of provider which specified in trackerOptions.excludes', async () => {
+    const { createTracker, provider: fooProvider } = setup();
+    const barProvider = mock<IProvider>({
+      name: 'bar',
+    });
+
+    const tracker = createTracker([fooProvider, barProvider]);
+    tracker.track('test', {
+      properties: { foo: 'bar' },
+      excludes: { bar: true },
+    });
+
+    await vi.runAllTimersAsync();
+
+    expect(fooProvider.onTrack).toHaveBeenCalledTimes(1);
+    expect(fooProvider.onTrack.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        "test",
+        {
+          "foo": "bar",
+        },
+        {
+          "excludes": {
+            "bar": true,
+          },
+          "properties": {
+            "foo": "bar",
+          },
+        },
+        {},
+      ]
+    `);
+
+    expect(barProvider.onTrack).toHaveBeenCalledTimes(0);
+    expect(barProvider.onTrack.mock.lastCall).toMatchInlineSnapshot('undefined');
   });
 
   describe('sessionProperties', () => {
     it('should store sessionProperties in tracker and merge properties', async () => {
-      const { createTracker, mockProvider } = setup();
+      const { createTracker, provider } = setup();
 
       const tracker = createTracker();
 
@@ -201,7 +269,24 @@ describe('track', () => {
 
       await vi.runAllTimersAsync();
 
-      expect(mockProvider.foo.onTrack).toMatchSnapshot();
+      expect(provider.onTrack.mock.lastCall).toMatchInlineSnapshot(`
+        [
+          "test",
+          {
+            "productId": "1",
+            "userId": "2",
+          },
+          {
+            "properties": {
+              "productId": "1",
+            },
+            "sessionProperties": {
+              "userId": "2",
+            },
+          },
+          {},
+        ]
+      `);
 
       tracker.track('test', {
         properties: { productId: '2' },
@@ -209,11 +294,25 @@ describe('track', () => {
 
       await vi.runAllTimersAsync();
 
-      expect(mockProvider.bar.onTrack).toMatchSnapshot();
+      expect(provider.onTrack.mock.lastCall).toMatchInlineSnapshot(`
+        [
+          "test",
+          {
+            "productId": "2",
+            "userId": "2",
+          },
+          {
+            "properties": {
+              "productId": "2",
+            },
+          },
+          {},
+        ]
+      `);
     });
 
     it('should clear sessionProperties after call clearSessionProperties', async () => {
-      const { createTracker, mockProvider } = setup();
+      const { createTracker, provider } = setup();
 
       const tracker = createTracker();
 
@@ -224,7 +323,24 @@ describe('track', () => {
 
       await vi.runAllTimersAsync();
 
-      expect(mockProvider.foo.onTrack).toMatchSnapshot();
+      expect(provider.onTrack.mock.lastCall).toMatchInlineSnapshot(`
+        [
+          "test",
+          {
+            "productId": "1",
+            "userId": "2",
+          },
+          {
+            "properties": {
+              "productId": "1",
+            },
+            "sessionProperties": {
+              "userId": "2",
+            },
+          },
+          {},
+        ]
+      `);
 
       tracker.clearSessionProperties();
 
@@ -234,7 +350,112 @@ describe('track', () => {
 
       await vi.runAllTimersAsync();
 
-      expect(mockProvider.bar.onTrack).toMatchSnapshot();
+      expect(provider.onTrack.mock.lastCall).toMatchInlineSnapshot(`
+        [
+          "test",
+          {
+            "productId": "2",
+          },
+          {
+            "properties": {
+              "productId": "2",
+            },
+          },
+          {},
+        ]
+      `);
     });
+  });
+});
+
+describe('identify', () => {
+  it("should call every providers' identify methods", async () => {
+    const { createTracker, provider: fooProvider } = setup();
+    const barProvider = mock<IProvider>({
+      name: 'bar',
+    });
+
+    const tracker = createTracker([fooProvider, barProvider]);
+
+    tracker.identify('test');
+
+    await vi.runAllTimersAsync();
+
+    expect(fooProvider.onIdentify).toHaveBeenCalledTimes(1);
+    expect(fooProvider.onIdentify.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        "test",
+        {},
+        {},
+      ]
+    `);
+
+    expect(barProvider.onIdentify).toHaveBeenCalledTimes(1);
+    expect(barProvider.onIdentify.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        "test",
+        {},
+        {},
+      ]
+    `);
+  });
+
+  it('should not call identify method of provider which not specified in options.includes', async () => {
+    const { createTracker, provider: fooProvider } = setup();
+    const barProvider = mock<IProvider>({
+      name: 'bar',
+    });
+
+    const tracker = createTracker([fooProvider, barProvider]);
+    tracker.identify('test', {
+      includes: { bar: true },
+    });
+
+    await vi.runAllTimersAsync();
+
+    expect(fooProvider.onIdentify).toHaveBeenCalledTimes(0);
+
+    expect(barProvider.onIdentify).toHaveBeenCalledTimes(1);
+    expect(barProvider.onIdentify.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        "test",
+        {
+          "includes": {
+            "bar": true,
+          },
+        },
+        {},
+      ]
+    `);
+  });
+
+  it('should not call identify method of provider which specified in options.excludes', async () => {
+    const { createTracker, provider: fooProvider } = setup();
+    const barProvider = mock<IProvider>({
+      name: 'bar',
+    });
+
+    const tracker = createTracker([fooProvider, barProvider]);
+    tracker.identify('test', {
+      excludes: { bar: true },
+    });
+
+    await vi.runAllTimersAsync();
+
+    expect(fooProvider.onIdentify).toHaveBeenCalledTimes(1);
+    expect(fooProvider.onIdentify.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        "test",
+        {
+          "excludes": {
+            "bar": true,
+          },
+        },
+        {},
+      ]
+    `);
+
+    expect(barProvider.onIdentify).toHaveBeenCalledTimes(0);
+    expect(barProvider.onIdentify.mock.lastCall).toMatchInlineSnapshot('undefined');
   });
 });

@@ -107,7 +107,13 @@ export class Tracker implements ITracker {
   };
 
   identify = (id: string, options: IdentifyOptions = {}) => {
-    throw new Error('Method not implemented.');
+    this.#initialized.then(() => {
+      const trackers = this.filterProviders(options);
+
+      trackers.forEach(provider => {
+        provider.onIdentify(id, options, {});
+      });
+    });
   };
 
   updateUserProperties = <UserProperties extends Record<string, any> = {}>(
