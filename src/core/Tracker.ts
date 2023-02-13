@@ -57,27 +57,39 @@ export class Tracker implements ITracker {
     await Promise.all(initPromises);
   }
 
-  private filterProviders(trackOptions: Options) {
-    if (trackOptions.includes && trackOptions.excludes) {
+  private filterProviders(options: Options) {
+    if (options.includes && options.excludes) {
       throw new Error('Cannot set both "includes" and "excludes" options. Choose one or none.');
     }
 
     const providers = Array.from(this.#providers.values());
 
-    if (trackOptions.includes) {
+    if (options.includes) {
       return providers.filter(
-        provider => !!trackOptions.includes![provider.name as TrackerProviderName],
+        provider => !!options.includes![provider.name as TrackerProviderName],
       );
     }
 
-    if (trackOptions.excludes) {
+    if (options.excludes) {
       return providers.filter(
-        provider => !trackOptions.excludes![provider.name as TrackerProviderName],
+        provider => !options.excludes![provider.name as TrackerProviderName],
       );
     }
 
     return providers;
   }
+
+  private getEventProperties = <
+    EventProperties extends Record<string, any> = {},
+    SessionProperties extends Record<string, any> = {},
+  >(options: TrackOptions<EventProperties, SessionProperties>): EventProperties & SessionProperties => {
+    Object.assign(this.#sessionProperties, options.sessionProperties);
+
+    return {
+      ...this.#sessionProperties,
+      ...options.properties,
+    } as EventProperties & SessionProperties;
+  };
 
   track = <
     EventName extends string = string,
@@ -86,14 +98,7 @@ export class Tracker implements ITracker {
   >(eventName: EventName, options: TrackOptions<EventProperties, SessionProperties> = {}) => {
     this.#initialized.then(() => {
       const trackers = this.filterProviders(options);
-
-      // TODO: get or store session properties
-      const sessionProperties = {} as SessionProperties;
-
-      const eventProperties = {
-        ...sessionProperties,
-        ...options.properties,
-      } as EventProperties & SessionProperties;
+      const eventProperties = this.getEventProperties(options);
 
       trackers.forEach(provider => {
         provider.onTrack(eventName, eventProperties, options, {});
@@ -110,5 +115,9 @@ export class Tracker implements ITracker {
     options: UpdateUserPropertiesOptions = {},
   ) => {
     throw new Error('Method not implemented.');
+  };
+
+  clearSessionProperties = () => {
+    this.#sessionProperties = {};
   };
 }

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, SpyInstance, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, Mock, SpyInstance, vi } from 'vitest';
 import { IProvider } from './interface.js';
 import { Tracker } from './Tracker.js';
 
@@ -188,6 +188,53 @@ describe('track', () => {
     expect(mockProvider.bar.onTrack).toMatchSnapshot();
   });
 
-  describe.skip('sessionProperties', () => {
+  describe('sessionProperties', () => {
+    it('should store sessionProperties in tracker and merge properties', async () => {
+      const { createTracker, mockProvider } = setup();
+
+      const tracker = createTracker();
+
+      tracker.track('test', {
+        properties: { productId: '1' },
+        sessionProperties: { userId: '2' },
+      });
+
+      await vi.runAllTimersAsync();
+
+      expect(mockProvider.foo.onTrack).toMatchSnapshot();
+
+      tracker.track('test', {
+        properties: { productId: '2' },
+      });
+
+      await vi.runAllTimersAsync();
+
+      expect(mockProvider.bar.onTrack).toMatchSnapshot();
+    });
+
+    it('should clear sessionProperties after call clearSessionProperties', async () => {
+      const { createTracker, mockProvider } = setup();
+
+      const tracker = createTracker();
+
+      tracker.track('test', {
+        properties: { productId: '1' },
+        sessionProperties: { userId: '2' },
+      });
+
+      await vi.runAllTimersAsync();
+
+      expect(mockProvider.foo.onTrack).toMatchSnapshot();
+
+      tracker.clearSessionProperties();
+
+      tracker.track('test', {
+        properties: { productId: '2' },
+      });
+
+      await vi.runAllTimersAsync();
+
+      expect(mockProvider.bar.onTrack).toMatchSnapshot();
+    });
   });
 });

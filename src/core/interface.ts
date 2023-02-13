@@ -65,4 +65,6 @@ export interface ITracker {
   updateUserProperties: <
     UserProperties extends Record<string, any> = {},
   >(userProperties: UserProperties, options?: UpdateUserPropertiesOptions<UserProperties>) => void;
+
+  clearSessionProperties: () => void;
 }
