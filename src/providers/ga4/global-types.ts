@@ -1,5 +1,3 @@
-import type { ConditionalKeys } from 'type-fest';
-
 declare global {
   interface Window {
     dataLayer: {
@@ -19,13 +17,6 @@ declare global {
       EventProperties extends Record<string, any> = {},
       SessionProperties extends Record<string, any> = {},
     > {
-      ga4?: {
-        eventCategoryKey?: keyof (EventProperties & SessionProperties);
-        eventLabelKey?: keyof (EventProperties & SessionProperties);
-        eventValueKey?: ConditionalKeys<EventProperties & SessionProperties, number>;
-      };
     }
   }
 }
-
-export {};

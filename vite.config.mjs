@@ -6,7 +6,6 @@ export default defineConfig({
       entry: [
         'src/core/index.ts',
         'src/react/index.ts',
-        'src/providers/mixpanel/index.ts',
         'src/providers/ga4/index.ts',
       ],
       formats: ['cjs', 'es'],

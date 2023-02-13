@@ -7,6 +7,7 @@
   "types": "dist/core/index.d.ts",
   "files": [
     "README.md",
+    "LICENSE",
     "package.json",
     "dist"
   ],
@@ -34,16 +35,6 @@
         "default": "./dist/react/index.cjs"
       }
     },
-    "./providers/mixpanel": {
-      "import": {
-        "types": "./dist/providers/mixpanel/index.d.ts",
-        "default": "./dist/providers/mixpanel/index.mjs"
-      },
-      "require": {
-        "types": "./dist/providers/mixpanel/index.d.ts",
-        "default": "./dist/providers/mixpanel/index.cjs"
-      }
-    },
     "./providers/ga4": {
       "import": {
         "types": "./dist/providers/ga4/index.d.ts",
@@ -65,9 +56,6 @@
     "vite": "^4.1.1",
     "vitest": "^0.28.4",
     "vitest-mock-extended": "^1.0.9"
-  },
-  "dependencies": {
-    "type-fest": "^3.5.6"
   },
   "peerDependencies": {
     "react": "^17 || ^18"

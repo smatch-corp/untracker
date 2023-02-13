@@ -6,7 +6,7 @@ export interface GA4ProviderOptions {
   tagId: string;
 }
 
-export const ga4 = (options: GA4ProviderOptions): IProvider => {
+export const ga4 = (ga4Options: GA4ProviderOptions): IProvider => {
   function gtag(...args: any[]) {
     (window as any).dataLayer.push(args);
   }
@@ -16,25 +16,17 @@ export const ga4 = (options: GA4ProviderOptions): IProvider => {
 
     init() {
       gtag('js', new Date());
-      gtag('config', options.tagId);
+      gtag('config', ga4Options.tagId);
     },
 
-    onIdentify(_id, _options, _context) {
-    },
-
-    onTrack(eventName, eventProperties, options, _context) {
-      gtag('event', eventName, {
-        ...eventProperties,
-        event_category: options.ga4?.eventCategoryKey
-          ? eventProperties[options.ga4.eventCategoryKey]
-          : undefined,
-        event_label: options.ga4?.eventLabelKey
-          ? eventProperties[options.ga4.eventLabelKey]
-          : undefined,
-        value: options.ga4?.eventValueKey
-          ? eventProperties[options.ga4.eventValueKey]
-          : undefined,
+    onIdentify(id, _options, _context) {
+      gtag('config', ga4Options.tagId, {
+        user_id: id,
       });
+    },
+
+    onTrack(eventName, eventProperties, _options, _context) {
+      gtag('event', eventName, eventProperties);
     },
 
     onUpdateUserProperties(_userProperties, _options, _context) {
