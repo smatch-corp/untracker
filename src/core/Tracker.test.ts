@@ -459,3 +459,102 @@ describe('identify', () => {
     expect(barProvider.onIdentify.mock.lastCall).toMatchInlineSnapshot('undefined');
   });
 });
+
+describe('updateUserProperties', () => {
+  it('should call every providers` updateUserProperties methods', async () => {
+    const { createTracker, provider: fooProvider } = setup();
+    const barProvider = mock<IProvider>({
+      name: 'bar',
+    });
+
+    const tracker = createTracker([fooProvider, barProvider]);
+    tracker.updateUserProperties({ name: 'John' });
+
+    await vi.runAllTimersAsync();
+
+    expect(fooProvider.onUpdateUserProperties).toHaveBeenCalledTimes(1);
+    expect(fooProvider.onUpdateUserProperties.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        {
+          "name": "John",
+        },
+        {},
+        {},
+      ]
+    `);
+
+    expect(barProvider.onUpdateUserProperties).toHaveBeenCalledTimes(1);
+    expect(barProvider.onUpdateUserProperties.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        {
+          "name": "John",
+        },
+        {},
+        {},
+      ]
+    `);
+  });
+
+  it('should not call updateUserProperties method of provider which not specified in options.includes', async () => {
+    const { createTracker, provider: fooProvider } = setup();
+    const barProvider = mock<IProvider>({
+      name: 'bar',
+    });
+
+    const tracker = createTracker([fooProvider, barProvider]);
+    tracker.updateUserProperties({ name: 'John' }, {
+      includes: { bar: true },
+    });
+
+    await vi.runAllTimersAsync();
+
+    expect(fooProvider.onUpdateUserProperties).toHaveBeenCalledTimes(0);
+
+    expect(barProvider.onUpdateUserProperties).toHaveBeenCalledTimes(1);
+    expect(barProvider.onUpdateUserProperties.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        {
+          "name": "John",
+        },
+        {
+          "includes": {
+            "bar": true,
+          },
+        },
+        {},
+      ]
+    `);
+  });
+
+  it('should not call updateUserProperties method of provider which specified in options.excludes', async () => {
+    const { createTracker, provider: fooProvider } = setup();
+    const barProvider = mock<IProvider>({
+      name: 'bar',
+    });
+
+    const tracker = createTracker([fooProvider, barProvider]);
+    tracker.updateUserProperties({ name: 'John' }, {
+      excludes: { bar: true },
+    });
+
+    await vi.runAllTimersAsync();
+
+    expect(fooProvider.onUpdateUserProperties).toHaveBeenCalledTimes(1);
+    expect(fooProvider.onUpdateUserProperties.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        {
+          "name": "John",
+        },
+        {
+          "excludes": {
+            "bar": true,
+          },
+        },
+        {},
+      ]
+    `);
+
+    expect(barProvider.onUpdateUserProperties).toHaveBeenCalledTimes(0);
+    expect(barProvider.onUpdateUserProperties.mock.lastCall).toMatchInlineSnapshot('undefined');
+  });
+});

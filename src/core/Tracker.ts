@@ -120,7 +120,13 @@ export class Tracker implements ITracker {
     userProperties: UserProperties,
     options: UpdateUserPropertiesOptions = {},
   ) => {
-    throw new Error('Method not implemented.');
+    this.#initialized.then(() => {
+      const trackers = this.filterProviders(options);
+
+      trackers.forEach(provider => {
+        provider.onUpdateUserProperties(userProperties, options, {});
+      });
+    });
   };
 
   clearSessionProperties = () => {
