@@ -6,11 +6,12 @@ export default defineConfig({
       entry: [
         'src/core/index.ts',
         'src/react/index.ts',
-        'src/providers/ga4/index.ts',
+        'src/providers/ga4.ts',
+        'src/providers/hackle.ts',
       ],
       formats: ['cjs', 'es'],
       fileName(format, entryName) {
-        const ext = format === 'es' ? 'js' : 'cjs';
+        const ext = format === 'es' ? 'mjs' : 'cjs';
 
         return [entryName, ext].join('.');
       },

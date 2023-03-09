@@ -1,0 +1,9 @@
+{
+  "name": "@smatch-corp/untracker/react",
+  "publishConfig": { "access": "public" },
+  "private": "false",
+  "type": "module",
+  "main": "../dist/react/index.cjs",
+  "module": "../dist/react/index.mjs",
+  "types": "../dist/react/index.d.ts"
+}

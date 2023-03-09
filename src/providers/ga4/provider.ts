@@ -15,8 +15,6 @@ export const ga4 = (ga4Options: GA4ProviderOptions): IProvider => {
     name: 'ga4',
 
     init() {
-      gtag('js', new Date());
-      gtag('config', ga4Options.tagId);
     },
 
     onIdentify(id, _options, _context) {

@@ -1,0 +1,9 @@
+{
+  "name": "@smatch-corp/untracker/providers/ga4",
+  "publishConfig": { "access": "public" },
+  "private": "false",
+  "type": "module",
+  "main": "../../dist/providers/ga4/index.cjs",
+  "module": "../../dist/providers/ga4/index.mjs",
+  "types": "../../dist/providers/ga4/index.d.ts"
+}

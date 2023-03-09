@@ -1,3 +1,4 @@
+import { createStorage, Storage } from 'unstorage';
 import {
   IdentifyOptions,
   IProvider,
@@ -9,15 +10,20 @@ import {
 } from './interface.js';
 
 export interface TrackerOptions {
+  storage?: Storage;
   providers: IProvider[];
 }
 
 export class Tracker implements ITracker {
   #providers: Map<string, IProvider>;
   #initialized: Promise<void>;
-  #sessionProperties: Record<string, any> = {};
+  #storage: Storage;
 
   constructor(options: TrackerOptions) {
+    this.#storage = typeof window !== 'undefined' && options.storage
+      ? options.storage
+      : createStorage();
+
     this.#providers = new Map();
     for (const provider of options.providers) {
       if (this.#providers.has(provider.name)) {
@@ -79,14 +85,20 @@ export class Tracker implements ITracker {
     return providers;
   }
 
-  private getEventProperties = <
+  private setSessionProperties = async (sessionProperties: any) => {
+    return this.#storage.setItem('sessionProperties', sessionProperties);
+  };
+
+  private getSessionProperties = async () => {
+    return await this.#storage.getItem('sessionProperties') as object;
+  };
+
+  private getEventProperties = async <
     EventProperties extends Record<string, any> = {},
     SessionProperties extends Record<string, any> = {},
-  >(options: TrackOptions<EventProperties, SessionProperties>): EventProperties & SessionProperties => {
-    Object.assign(this.#sessionProperties, options.sessionProperties);
-
+  >(options: TrackOptions<EventProperties, SessionProperties>): Promise<EventProperties & SessionProperties> => {
     return {
-      ...this.#sessionProperties,
+      ...await this.getSessionProperties(),
       ...options.properties,
     } as EventProperties & SessionProperties;
   };
@@ -96,9 +108,14 @@ export class Tracker implements ITracker {
     EventProperties extends Record<string, any> = {},
     SessionProperties extends Record<string, any> = {},
   >(eventName: EventName, options: TrackOptions<EventProperties, SessionProperties> = {}) => {
-    this.#initialized.then(() => {
+    this.#initialized.then(async () => {
       const trackers = this.filterProviders(options);
-      const eventProperties = this.getEventProperties(options);
+
+      if (options.sessionProperties) {
+        await this.setSessionProperties(options.sessionProperties);
+      }
+
+      const eventProperties = await this.getEventProperties(options);
 
       trackers.forEach(provider => {
         provider.onTrack(eventName, eventProperties, options, {});
@@ -130,6 +147,6 @@ export class Tracker implements ITracker {
   };
 
   clearSessionProperties = () => {
-    this.#sessionProperties = {};
+    this.#storage.clear();
   };
 }
