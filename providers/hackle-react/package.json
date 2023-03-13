@@ -1,0 +1,9 @@
+{
+  "name": "@smatch-corp/untracker/providers/hackle-react",
+  "publishConfig": { "access": "public" },
+  "private": "false",
+  "type": "module",
+  "main": "../../dist/providers/hackle-react/index.cjs",
+  "module": "../../dist/providers/hackle-react/index.mjs",
+  "types": "../../dist/providers/hackle-react/index.d.ts"
+}

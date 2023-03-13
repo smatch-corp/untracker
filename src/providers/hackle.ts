@@ -1,1 +1,1 @@
-export * from './hackle/index.js';
+export * from './hackle-react/index.js';

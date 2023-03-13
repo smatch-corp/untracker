@@ -3,7 +3,7 @@ import { PickProperties } from 'ts-essentials';
 declare global {
   export namespace TrackerTypes {
     export interface TrackerProviders {
-      hackle: true;
+      hackleReact: true;
     }
 
     export interface TrackerContext {
@@ -13,7 +13,7 @@ declare global {
       EventProperties extends Record<string, any> = {},
       SessionProperties extends Record<string, any> = {},
     > {
-      hackle?: {
+      hackleReact?: {
         valueKey?: keyof PickProperties<EventProperties & SessionProperties, number>;
       };
     }
