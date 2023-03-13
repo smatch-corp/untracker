@@ -7,7 +7,7 @@ export default defineConfig({
         'src/core/index.ts',
         'src/react/index.ts',
         'src/providers/ga4.ts',
-        'src/providers/hackle.ts',
+        'src/providers/hackle-react.ts',
       ],
       formats: ['cjs', 'es'],
       fileName(format, entryName) {
