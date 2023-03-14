@@ -23,6 +23,9 @@ export interface UpdateUserPropertiesOptions<
 > extends Options, TrackerTypes.UpdateUserPropertiesOptions<UserProperties> {
 }
 
+export interface ResetOptions extends Options, TrackerTypes.ResetOptions {
+}
+
 export interface IProvider {
   name: string;
 
@@ -51,6 +54,8 @@ export interface IProvider {
     options: UpdateUserPropertiesOptions<UserProperties>,
     context: TrackerTypes.TrackerContext,
   ) => void;
+
+  onReset?: (options?: ResetOptions) => void;
 }
 
 export interface ITracker {
@@ -66,5 +71,11 @@ export interface ITracker {
     UserProperties extends Record<string, any> = {},
   >(userProperties: UserProperties, options?: UpdateUserPropertiesOptions<UserProperties>) => void;
 
-  clearSessionProperties: () => void;
+  reset: (options?: ResetOptions) => void;
+
+  setSessionProperties: (sessionProperties: Record<string, any>) => Promise<void>;
+
+  deleteSessionProperty: (key: string) => Promise<void>;
+
+  clearSessionProperties: () => Promise<void>;
 }

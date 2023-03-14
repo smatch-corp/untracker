@@ -24,7 +24,7 @@ afterEach(() => {
 });
 
 const setup = () => {
-  const provider = mock<IProvider>({
+  const provider = mock<Required<IProvider>>({
     name: 'foo',
   });
 
@@ -47,7 +47,7 @@ describe('init', () => {
   it('should throw error if provider name is not unique', () => {
     const { createTracker, provider } = setup();
 
-    const duplicatedProvider = mock<IProvider>({
+    const duplicatedProvider = mock<Required<IProvider>>({
       name: provider.name,
     });
 
@@ -138,7 +138,7 @@ describe('init', () => {
 describe('track', () => {
   it("should call every providers' track methods", async () => {
     const { createTracker, provider } = setup();
-    const yetAnotherProvider = mock<IProvider>({
+    const yetAnotherProvider = mock<Required<IProvider>>({
       name: 'yetAnotherProvider',
     });
 
@@ -185,7 +185,7 @@ describe('track', () => {
 
   it('should not call track method of provider which not specified in trackerOptions.includes', async () => {
     const { createTracker, provider: fooProvider } = setup();
-    const barProvider = mock<IProvider>({
+    const barProvider = mock<Required<IProvider>>({
       name: 'bar',
     });
 
@@ -221,7 +221,7 @@ describe('track', () => {
 
   it('should not call track method of provider which specified in trackerOptions.excludes', async () => {
     const { createTracker, provider: fooProvider } = setup();
-    const barProvider = mock<IProvider>({
+    const barProvider = mock<Required<IProvider>>({
       name: 'bar',
     });
 
@@ -371,7 +371,7 @@ describe('track', () => {
 describe('identify', () => {
   it("should call every providers' identify methods", async () => {
     const { createTracker, provider: fooProvider } = setup();
-    const barProvider = mock<IProvider>({
+    const barProvider = mock<Required<IProvider>>({
       name: 'bar',
     });
 
@@ -402,7 +402,7 @@ describe('identify', () => {
 
   it('should not call identify method of provider which not specified in options.includes', async () => {
     const { createTracker, provider: fooProvider } = setup();
-    const barProvider = mock<IProvider>({
+    const barProvider = mock<Required<IProvider>>({
       name: 'bar',
     });
 
@@ -431,7 +431,7 @@ describe('identify', () => {
 
   it('should not call identify method of provider which specified in options.excludes', async () => {
     const { createTracker, provider: fooProvider } = setup();
-    const barProvider = mock<IProvider>({
+    const barProvider = mock<Required<IProvider>>({
       name: 'bar',
     });
 
@@ -463,7 +463,7 @@ describe('identify', () => {
 describe('updateUserProperties', () => {
   it('should call every providers` updateUserProperties methods', async () => {
     const { createTracker, provider: fooProvider } = setup();
-    const barProvider = mock<IProvider>({
+    const barProvider = mock<Required<IProvider>>({
       name: 'bar',
     });
 
@@ -497,7 +497,7 @@ describe('updateUserProperties', () => {
 
   it('should not call updateUserProperties method of provider which not specified in options.includes', async () => {
     const { createTracker, provider: fooProvider } = setup();
-    const barProvider = mock<IProvider>({
+    const barProvider = mock<Required<IProvider>>({
       name: 'bar',
     });
 
@@ -528,7 +528,7 @@ describe('updateUserProperties', () => {
 
   it('should not call updateUserProperties method of provider which specified in options.excludes', async () => {
     const { createTracker, provider: fooProvider } = setup();
-    const barProvider = mock<IProvider>({
+    const barProvider = mock<Required<IProvider>>({
       name: 'bar',
     });
 
@@ -556,5 +556,152 @@ describe('updateUserProperties', () => {
 
     expect(barProvider.onUpdateUserProperties).toHaveBeenCalledTimes(0);
     expect(barProvider.onUpdateUserProperties.mock.lastCall).toMatchInlineSnapshot('undefined');
+  });
+});
+
+describe('setSessionProperties', () => {
+  it('should track event with session properties', async () => {
+    const { createTracker, provider } = setup();
+    const tracker = createTracker();
+
+    await tracker.setSessionProperties({ bar: true });
+    tracker.track('test', { properties: { foo: 'bar' } });
+
+    await vi.runAllTimersAsync();
+
+    expect(provider.onTrack).toHaveBeenCalledTimes(1);
+    expect(provider.onTrack.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        "test",
+        {
+          "bar": true,
+          "foo": "bar",
+        },
+        {
+          "properties": {
+            "foo": "bar",
+          },
+        },
+        {},
+      ]
+    `);
+  });
+});
+
+describe('deleteSessionProperty', () => {
+  it('should delete specific session property', async () => {
+    const { createTracker, provider } = setup();
+    const tracker = createTracker();
+
+    await tracker.setSessionProperties({ bar: true, zax: true });
+    await tracker.deleteSessionProperty('zax');
+
+    tracker.track('test', { properties: { foo: 'bar' } });
+    await vi.runAllTimersAsync();
+
+    expect(provider.onTrack).toHaveBeenCalledTimes(1);
+    expect(provider.onTrack.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        "test",
+        {
+          "bar": true,
+          "foo": "bar",
+        },
+        {
+          "properties": {
+            "foo": "bar",
+          },
+        },
+        {},
+      ]
+    `);
+  });
+});
+
+describe('clearSessionProperties', () => {
+  it('should clear session properties', async () => {
+    const { createTracker, provider } = setup();
+    const tracker = createTracker();
+
+    await tracker.setSessionProperties({ bar: true, zax: true });
+    await tracker.clearSessionProperties();
+
+    tracker.track('test', { properties: { foo: 'bar' } });
+    await vi.runAllTimersAsync();
+
+    expect(provider.onTrack).toHaveBeenCalledTimes(1);
+    expect(provider.onTrack.mock.lastCall).toMatchInlineSnapshot(`
+      [
+        "test",
+        {
+          "foo": "bar",
+        },
+        {
+          "properties": {
+            "foo": "bar",
+          },
+        },
+        {},
+      ]
+    `);
+  });
+});
+
+describe('reset', () => {
+  it('should call every providers` reset methods', async () => {
+    const { createTracker, provider: fooProvider } = setup();
+    const barProvider = mock<Required<IProvider>>({
+      name: 'bar',
+    });
+
+    const tracker = createTracker([fooProvider, barProvider]);
+    tracker.reset();
+
+    await vi.runAllTimersAsync();
+
+    expect(fooProvider.onReset).toHaveBeenCalledTimes(1);
+    expect(fooProvider.onReset.mock.lastCall).toMatchInlineSnapshot('[]');
+
+    expect(barProvider.onReset).toHaveBeenCalledTimes(1);
+    expect(barProvider.onReset.mock.lastCall).toMatchInlineSnapshot('[]');
+  });
+
+  it('should not call reset method of provider which not specified in options.includes', async () => {
+    const { createTracker, provider: fooProvider } = setup();
+    const barProvider = mock<Required<IProvider>>({
+      name: 'bar',
+    });
+
+    const tracker = createTracker([fooProvider, barProvider]);
+    tracker.reset({
+      includes: { bar: true },
+    });
+
+    await vi.runAllTimersAsync();
+
+    expect(fooProvider.onReset).toHaveBeenCalledTimes(0);
+
+    expect(barProvider.onReset).toHaveBeenCalledTimes(1);
+    expect(barProvider.onReset.mock.lastCall).toMatchInlineSnapshot('[]');
+  });
+
+  it('should not call reset method of provider which specified in options.excludes', async () => {
+    const { createTracker, provider: fooProvider } = setup();
+    const barProvider = mock<Required<IProvider>>({
+      name: 'bar',
+    });
+
+    const tracker = createTracker([fooProvider, barProvider]);
+    tracker.reset({
+      excludes: { bar: true },
+    });
+
+    await vi.runAllTimersAsync();
+
+    expect(fooProvider.onReset).toHaveBeenCalledTimes(1);
+    expect(fooProvider.onReset.mock.lastCall).toMatchInlineSnapshot('[]');
+
+    expect(barProvider.onReset).toHaveBeenCalledTimes(0);
+    expect(barProvider.onReset.mock.lastCall).toMatchInlineSnapshot('undefined');
   });
 });

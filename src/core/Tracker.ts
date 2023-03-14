@@ -4,6 +4,7 @@ import {
   IProvider,
   ITracker,
   Options,
+  ResetOptions,
   TrackerProviderName,
   TrackOptions,
   UpdateUserPropertiesOptions,
@@ -85,10 +86,6 @@ export class Tracker implements ITracker {
     return providers;
   }
 
-  private setSessionProperties = async (sessionProperties: any) => {
-    return this.#storage.setItem('sessionProperties', sessionProperties);
-  };
-
   private getSessionProperties = async () => {
     return await this.#storage.getItem('sessionProperties') as object;
   };
@@ -101,6 +98,22 @@ export class Tracker implements ITracker {
       ...await this.getSessionProperties(),
       ...options.properties,
     } as EventProperties & SessionProperties;
+  };
+
+  setSessionProperties = async (sessionProperties: any) => {
+    return this.#storage.setItem('sessionProperties', sessionProperties);
+  };
+
+  deleteSessionProperty = async (key: string) => {
+    const sessionProperties = await this.getSessionProperties();
+
+    return this.setSessionProperties(Object.fromEntries(
+      Object.entries(sessionProperties).filter(([$key]) => $key !== key),
+    ));
+  };
+
+  clearSessionProperties = () => {
+    return this.#storage.removeItem('sessionProperties');
   };
 
   track = <
@@ -146,7 +159,13 @@ export class Tracker implements ITracker {
     });
   };
 
-  clearSessionProperties = () => {
-    this.#storage.clear();
+  reset = (options: ResetOptions = {}) => {
+    this.#initialized.then(() => {
+      const trackers = this.filterProviders(options);
+
+      trackers.forEach(provider => {
+        provider.onReset?.();
+      });
+    });
   };
 }

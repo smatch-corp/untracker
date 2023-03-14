@@ -43,5 +43,9 @@ export const mixpanel = (providerOptions: MixpanelProviderOptions): IProvider =>
     onUpdateUserProperties(userProperties, _options, _context) {
       instance.people.set(userProperties);
     },
+
+    onReset() {
+      instance.reset();
+    },
   };
 };

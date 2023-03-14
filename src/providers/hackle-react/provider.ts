@@ -35,5 +35,9 @@ export const hackleReact = (providerOptions: HackleReactProviderOptions): IProvi
         hackle.setUserProperty(key, value);
       }
     },
+
+    onReset() {
+      hackle.resetUser();
+    },
   };
 };

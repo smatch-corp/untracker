@@ -19,5 +19,7 @@ declare global {
       UserProperties extends Record<string, any> = {},
     > {
     }
+
+    export interface ResetOptions {}
   }
 }
