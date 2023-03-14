@@ -595,9 +595,11 @@ __metadata:
   resolution: "@smatch-corp/untracker@workspace:."
   dependencies:
     "@hackler/react-sdk": ^11.11.0
+    "@types/mixpanel-browser": ^2.38.1
     "@types/react": ^18.0.27
     "@vitest/ui": ^0.28.4
     happy-dom: ^8.2.6
+    mixpanel-browser: ^2.45.0
     react: ^18.2.0
     ts-essentials: ^9.3.1
     typescript: ^4.9.5
@@ -607,10 +609,13 @@ __metadata:
     vitest-mock-extended: ^1.0.9
   peerDependencies:
     "@hackler/react-sdk": "*"
+    mixpanel-browser: "*"
     react: ^17 || ^18
     unstorage: ^1
   peerDependenciesMeta:
     "@hackler/react-sdk":
+      optional: true
+    mixpanel-browser:
       optional: true
     react:
       optional: true
@@ -637,6 +642,13 @@ __metadata:
   version: 4.3.4
   resolution: "@types/chai@npm:4.3.4"
   checksum: 571184967beb03bf64c4392a13a7d44e72da9af5a1e83077ff81c39cf59c0fda2a5c78d2005084601cf8f3d11726608574d8b5b4a0e3e9736792807afd926cd0
+  languageName: node
+  linkType: hard
+
+"@types/mixpanel-browser@npm:^2.38.1":
+  version: 2.38.1
+  resolution: "@types/mixpanel-browser@npm:2.38.1"
+  checksum: ff32a3ca24d62a7e71d68f943b15e825899627c94b107df99196ed12321f9f3eaa4c717fed900627e1d377e3e5b44cffa503317ac0f6f9b89eb906dddc1aebbb
   languageName: node
   linkType: hard
 
@@ -2160,6 +2172,13 @@ __metadata:
     minipass: ^3.0.0
     yallist: ^4.0.0
   checksum: f1fdeac0b07cf8f30fcf12f4b586795b97be856edea22b5e9072707be51fc95d41487faec3f265b42973a304fe3a64acd91a44a3826a963e37b37bafde0212c3
+  languageName: node
+  linkType: hard
+
+"mixpanel-browser@npm:^2.45.0":
+  version: 2.45.0
+  resolution: "mixpanel-browser@npm:2.45.0"
+  checksum: 43722dd5019ece65302e933f3d5812ea015aff8525b3ba5347da9cd8694871ed85179047bf2bc7f47cd58c050158ea4ce84cc2810e128988c151fe4457f52f55
   languageName: node
   linkType: hard
 

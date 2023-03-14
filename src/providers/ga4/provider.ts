@@ -8,14 +8,12 @@ export interface GA4ProviderOptions {
 
 export const ga4 = (ga4Options: GA4ProviderOptions): IProvider => {
   function gtag(...args: any[]) {
+    (window as any).dataLayer ||= [];
     (window as any).dataLayer.push(args);
   }
 
   return {
     name: 'ga4',
-
-    init() {
-    },
 
     onIdentify(id, _options, _context) {
       gtag('config', ga4Options.tagId, {
@@ -25,9 +23,6 @@ export const ga4 = (ga4Options: GA4ProviderOptions): IProvider => {
 
     onTrack(eventName, eventProperties, _options, _context) {
       gtag('event', eventName, eventProperties);
-    },
-
-    onUpdateUserProperties(_userProperties, _options, _context) {
     },
   };
 };

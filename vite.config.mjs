@@ -8,6 +8,7 @@ export default defineConfig({
         'src/react/index.ts',
         'src/providers/ga4.ts',
         'src/providers/hackle-react.ts',
+        'src/providers/mixpanel.ts',
       ],
       formats: ['cjs', 'es'],
       fileName(format, entryName) {

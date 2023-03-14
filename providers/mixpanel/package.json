@@ -1,0 +1,9 @@
+{
+  "name": "@smatch-corp/untracker/providers/mixpanel",
+  "publishConfig": { "access": "public" },
+  "private": "false",
+  "type": "module",
+  "main": "../../dist/providers/mixpanel/index.cjs",
+  "module": "../../dist/providers/mixpanel/index.mjs",
+  "types": "../../dist/providers/mixpanel/index.d.ts"
+}

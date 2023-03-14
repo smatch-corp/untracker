@@ -41,7 +41,7 @@ export class Tracker implements ITracker {
 
     for (const provider of this.#providers.values()) {
       const initPromise = Promise.race([
-        provider.init(),
+        (provider.init ?? Promise.resolve)(),
         new Promise((_resolve, reject) =>
           setTimeout(reject, 3000, `Provider ${provider.name} is timeout during initalize.`)
         ),
@@ -118,7 +118,7 @@ export class Tracker implements ITracker {
       const eventProperties = await this.getEventProperties(options);
 
       trackers.forEach(provider => {
-        provider.onTrack(eventName, eventProperties, options, {});
+        provider.onTrack?.(eventName, eventProperties, options, {});
       });
     });
   };
@@ -128,7 +128,7 @@ export class Tracker implements ITracker {
       const trackers = this.filterProviders(options);
 
       trackers.forEach(provider => {
-        provider.onIdentify(id, options, {});
+        provider.onIdentify?.(id, options, {});
       });
     });
   };
@@ -141,7 +141,7 @@ export class Tracker implements ITracker {
       const trackers = this.filterProviders(options);
 
       trackers.forEach(provider => {
-        provider.onUpdateUserProperties(userProperties, options, {});
+        provider.onUpdateUserProperties?.(userProperties, options, {});
       });
     });
   };

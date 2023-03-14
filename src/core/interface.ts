@@ -26,9 +26,9 @@ export interface UpdateUserPropertiesOptions<
 export interface IProvider {
   name: string;
 
-  init: () => void | Promise<void>;
+  init?: () => void | Promise<void>;
 
-  onTrack: <
+  onTrack?: <
     EventProperties extends Record<string, any> = {},
     SessionProperties extends Record<string, any> = {},
   >(
@@ -38,13 +38,13 @@ export interface IProvider {
     context: TrackerTypes.TrackerContext,
   ) => void;
 
-  onIdentify: (
+  onIdentify?: (
     id: string,
     options: IdentifyOptions,
     context: TrackerTypes.TrackerContext,
   ) => void;
 
-  onUpdateUserProperties: <
+  onUpdateUserProperties?: <
     UserProperties extends Record<string, any> = {},
   >(
     userProperties: UserProperties,

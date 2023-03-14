@@ -55,9 +55,11 @@
   "packageManager": "yarn@3.4.1",
   "devDependencies": {
     "@hackler/react-sdk": "^11.11.0",
+    "@types/mixpanel-browser": "^2.38.1",
     "@types/react": "^18.0.27",
     "@vitest/ui": "^0.28.4",
     "happy-dom": "^8.2.6",
+    "mixpanel-browser": "^2.45.0",
     "react": "^18.2.0",
     "typescript": "^4.9.5",
     "unstorage": "^1.4.0",
@@ -67,11 +69,15 @@
   },
   "peerDependencies": {
     "@hackler/react-sdk": "*",
+    "mixpanel-browser": "*",
     "react": "^17 || ^18",
     "unstorage": "^1"
   },
   "peerDependenciesMeta": {
     "@hackler/react-sdk": {
+      "optional": true
+    },
+    "mixpanel-browser": {
       "optional": true
     },
     "react": {
