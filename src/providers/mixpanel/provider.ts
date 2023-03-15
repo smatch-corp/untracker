@@ -15,6 +15,10 @@ export const mixpanel = (providerOptions: MixpanelProviderOptions): IProvider =>
     name: 'mixpanel',
 
     init() {
+      if (instance) {
+        return;
+      }
+
       return new Promise(resolve => {
         import('mixpanel-browser').then(({ default: $mixpanel }) => {
           $mixpanel.init(token, {

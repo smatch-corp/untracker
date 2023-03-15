@@ -1,9 +1,9 @@
 {
-  "name": "@smatch-corp/untracker/providers/ga4",
+  "name": "@smatch-corp/untracker/providers/gtm",
   "publishConfig": { "access": "public" },
   "private": "false",
   "type": "module",
-  "main": "./dist/ga4.cjs",
-  "module": "./dist/ga4.mjs",
-  "types": "../ga4.d.ts"
+  "main": "./dist/gtm.cjs",
+  "module": "./dist/gtm.mjs",
+  "types": "../gtm.d.ts"
 }

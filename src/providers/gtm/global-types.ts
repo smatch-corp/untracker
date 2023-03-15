@@ -7,7 +7,7 @@ declare global {
 
   export namespace TrackerTypes {
     export interface TrackerProviders {
-      ga4: true;
+      gtm: true;
     }
 
     export interface TrackerContext {
