@@ -8,7 +8,8 @@
     "declarationMap": true,
     "emitDeclarationOnly": true,
     "sourceMap": true,
-    "outDir": "./dist",
+    "outDir": ".",
+    "rootDir": "src",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -17,6 +18,7 @@
   "exclude": [
     "**/__snapshots__",
     "**/*.test.ts",
-    "dist"
+    "**/dist",
+    "**/*.d.ts"
   ]
 }

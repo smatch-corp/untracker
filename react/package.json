@@ -3,7 +3,7 @@
   "publishConfig": { "access": "public" },
   "private": "false",
   "type": "module",
-  "main": "../dist/react/index.cjs",
-  "module": "../dist/react/index.mjs",
-  "types": "../dist/react/index.d.ts"
+  "main": "./index.cjs",
+  "module": "./index.mjs",
+  "types": "./index.d.ts"
 }

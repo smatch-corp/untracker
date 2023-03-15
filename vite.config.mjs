@@ -1,15 +1,9 @@
+import { mergeConfig } from 'vite';
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export const baseConfig = defineConfig({
   build: {
     lib: {
-      entry: [
-        'src/core/index.ts',
-        'src/react/index.ts',
-        'src/providers/ga4.ts',
-        'src/providers/hackle-react.ts',
-        'src/providers/mixpanel.ts',
-      ],
       formats: ['cjs', 'es'],
       fileName(format, entryName) {
         const ext = format === 'es' ? 'mjs' : 'cjs';
@@ -17,7 +11,6 @@ export default defineConfig({
         return [entryName, ext].join('.');
       },
     },
-    outDir: 'dist',
     rollupOptions: {
       external: (id) => {
         return (
@@ -26,9 +19,9 @@ export default defineConfig({
       },
       output: {
         preserveModules: true,
-        preserveModulesRoot: 'src',
       },
     },
+    emptyOutDir: false,
     sourcemap: true,
   },
   test: {
@@ -36,3 +29,13 @@ export default defineConfig({
     environment: 'happy-dom',
   },
 });
+
+export default mergeConfig(
+  baseConfig,
+  defineConfig({
+    build: {
+      lib: { entry: 'src/core/index.ts' },
+      outDir: 'core',
+    },
+  }),
+);

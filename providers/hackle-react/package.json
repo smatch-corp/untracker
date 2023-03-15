@@ -3,7 +3,7 @@
   "publishConfig": { "access": "public" },
   "private": "false",
   "type": "module",
-  "main": "../../dist/providers/hackle-react/index.cjs",
-  "module": "../../dist/providers/hackle-react/index.mjs",
-  "types": "../../dist/providers/hackle-react/index.d.ts"
+  "main": "./dist/hackle-react.cjs",
+  "module": "./dist/hackle-react.mjs",
+  "types": "../hackle-react.d.ts"
 }

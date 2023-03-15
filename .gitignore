@@ -8,3 +8,16 @@
 dist
 
 node_modules
+
+core/**/*.d.ts
+core/**/*.cjs
+core/**/*.mjs
+core/**/*.map
+react/**/*.d.ts
+react/**/*.cjs
+react/**/*.mjs
+react/**/*.map
+providers/**/*.d.ts
+providers/**/*.cjs
+providers/**/*.mjs
+providers/**/*.map

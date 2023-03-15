@@ -3,7 +3,7 @@
   "publishConfig": { "access": "public" },
   "private": "false",
   "type": "module",
-  "main": "../../dist/providers/ga4/index.cjs",
-  "module": "../../dist/providers/ga4/index.mjs",
-  "types": "../../dist/providers/ga4/index.d.ts"
+  "main": "./dist/ga4.cjs",
+  "module": "./dist/ga4.mjs",
+  "types": "../ga4.d.ts"
 }
