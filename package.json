@@ -1,6 +1,6 @@
 {
   "name": "@smatch-corp/untracker",
-  "version": "0.1.7",
+  "version": "0.1.10",
   "publishConfig": {
     "access": "public"
   },
