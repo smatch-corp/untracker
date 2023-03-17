@@ -1,7 +1,17 @@
 import { createContext, FC, ReactNode, useContext } from 'react';
 import { ITracker } from '../core/interface.js';
 
-const TrackerContext = createContext<ITracker>(null as never);
+const noop = async () => void 0;
+
+const TrackerContext = createContext<ITracker>({
+  clearSessionProperties: noop,
+  deleteSessionProperty: noop,
+  identify: noop,
+  reset: noop,
+  setSessionProperties: noop,
+  track: noop,
+  updateUserProperties: noop,
+});
 
 interface TrackerProviderProps {
   tracker: ITracker;
