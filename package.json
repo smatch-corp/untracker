@@ -85,8 +85,5 @@
     "react": {
       "optional": true
     }
-  },
-  "dependencies": {
-    "ts-essentials": "^9.3.1"
   }
 }

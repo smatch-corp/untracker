@@ -1,4 +1,4 @@
-import { PickProperties } from 'ts-essentials';
+import type { PickProperties } from './types.js';
 
 declare global {
   export namespace TrackerTypes {
