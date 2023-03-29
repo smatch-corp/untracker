@@ -309,6 +309,33 @@ describe('track', () => {
           {},
         ]
       `);
+
+      tracker.track('test', {
+        properties: { productId: '3' },
+        sessionProperties: { companyName: 'foo inc.' },
+      });
+
+      await vi.runAllTimersAsync();
+
+      expect(provider.onTrack.mock.lastCall).toMatchInlineSnapshot(`
+        [
+          "test",
+          {
+            "companyName": "foo inc.",
+            "productId": "3",
+            "userId": "2",
+          },
+          {
+            "properties": {
+              "productId": "3",
+            },
+            "sessionProperties": {
+              "companyName": "foo inc.",
+            },
+          },
+          {},
+        ]
+      `);
     });
 
     it('should clear sessionProperties after call clearSessionProperties', async () => {
@@ -606,6 +633,7 @@ describe('deleteSessionProperty', () => {
         {
           "bar": true,
           "foo": "bar",
+          "zax": true,
         },
         {
           "properties": {

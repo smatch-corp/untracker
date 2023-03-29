@@ -101,7 +101,10 @@ export class Tracker implements ITracker {
   };
 
   setSessionProperties = async (sessionProperties: any) => {
-    return this.#storage.setItem('sessionProperties', sessionProperties);
+    return this.#storage.setItem('sessionProperties', {
+      ...await this.getSessionProperties(),
+      ...sessionProperties,
+    });
   };
 
   deleteSessionProperty = async (key: string) => {
