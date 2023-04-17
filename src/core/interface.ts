@@ -63,15 +63,15 @@ export interface ITracker {
     EventName extends string = string,
     EventProperties extends Record<string, any> = {},
     SessionProperties extends Record<string, any> = {},
-  >(eventName: EventName, options?: TrackOptions<EventProperties, SessionProperties>) => void;
+  >(eventName: EventName, options?: TrackOptions<EventProperties, SessionProperties>) => Promise<void>;
 
-  identify: (id: string, options?: IdentifyOptions) => void;
+  identify: (id: string, options?: IdentifyOptions) => Promise<void>;
 
   updateUserProperties: <
     UserProperties extends Record<string, any> = {},
-  >(userProperties: UserProperties, options?: UpdateUserPropertiesOptions<UserProperties>) => void;
+  >(userProperties: UserProperties, options?: UpdateUserPropertiesOptions<UserProperties>) => Promise<void>;
 
-  reset: (options?: ResetOptions) => void;
+  reset: (options?: ResetOptions) => Promise<void>;
 
   setSessionProperties: (sessionProperties: Record<string, any>) => Promise<void>;
 

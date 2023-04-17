@@ -28,7 +28,7 @@ const setup = () => {
     name: 'foo',
   });
 
-  const createTracker = (providers: IProvider[] = [provider]) => {
+  const createTracker = (providers: () => IProvider[] = () => [provider]) => {
     return new Tracker({ providers });
   };
 
@@ -51,7 +51,7 @@ describe('init', () => {
       name: provider.name,
     });
 
-    expect(() => createTracker([provider, duplicatedProvider])).toThrowErrorMatchingInlineSnapshot(
+    expect(() => createTracker(() => [provider, duplicatedProvider])).toThrowErrorMatchingInlineSnapshot(
       '"Provider name \\"foo\\" is already in use. Provider names must be unique."',
     );
   });
@@ -142,7 +142,7 @@ describe('track', () => {
       name: 'yetAnotherProvider',
     });
 
-    const tracker = createTracker([provider, yetAnotherProvider]);
+    const tracker = createTracker(() => [provider, yetAnotherProvider]);
 
     tracker.track('test', {
       properties: { foo: 'bar' },
@@ -189,7 +189,7 @@ describe('track', () => {
       name: 'bar',
     });
 
-    const tracker = createTracker([fooProvider, barProvider]);
+    const tracker = createTracker(() => [fooProvider, barProvider]);
     tracker.track('test', {
       properties: { foo: 'bar' },
       includes: { bar: true },
@@ -225,7 +225,7 @@ describe('track', () => {
       name: 'bar',
     });
 
-    const tracker = createTracker([fooProvider, barProvider]);
+    const tracker = createTracker(() => [fooProvider, barProvider]);
     tracker.track('test', {
       properties: { foo: 'bar' },
       excludes: { bar: true },
@@ -402,7 +402,7 @@ describe('identify', () => {
       name: 'bar',
     });
 
-    const tracker = createTracker([fooProvider, barProvider]);
+    const tracker = createTracker(() => [fooProvider, barProvider]);
 
     tracker.identify('test');
 
@@ -433,7 +433,7 @@ describe('identify', () => {
       name: 'bar',
     });
 
-    const tracker = createTracker([fooProvider, barProvider]);
+    const tracker = createTracker(() => [fooProvider, barProvider]);
     tracker.identify('test', {
       includes: { bar: true },
     });
@@ -462,7 +462,7 @@ describe('identify', () => {
       name: 'bar',
     });
 
-    const tracker = createTracker([fooProvider, barProvider]);
+    const tracker = createTracker(() => [fooProvider, barProvider]);
     tracker.identify('test', {
       excludes: { bar: true },
     });
@@ -494,7 +494,7 @@ describe('updateUserProperties', () => {
       name: 'bar',
     });
 
-    const tracker = createTracker([fooProvider, barProvider]);
+    const tracker = createTracker(() => [fooProvider, barProvider]);
     tracker.updateUserProperties({ name: 'John' });
 
     await vi.runAllTimersAsync();
@@ -528,7 +528,7 @@ describe('updateUserProperties', () => {
       name: 'bar',
     });
 
-    const tracker = createTracker([fooProvider, barProvider]);
+    const tracker = createTracker(() => [fooProvider, barProvider]);
     tracker.updateUserProperties({ name: 'John' }, {
       includes: { bar: true },
     });
@@ -559,7 +559,7 @@ describe('updateUserProperties', () => {
       name: 'bar',
     });
 
-    const tracker = createTracker([fooProvider, barProvider]);
+    const tracker = createTracker(() => [fooProvider, barProvider]);
     tracker.updateUserProperties({ name: 'John' }, {
       excludes: { bar: true },
     });
@@ -622,6 +622,7 @@ describe('deleteSessionProperty', () => {
 
     await tracker.setSessionProperties({ bar: true, zax: true });
     await tracker.deleteSessionProperty('zax');
+    await vi.runAllTimersAsync();
 
     tracker.track('test', { properties: { foo: 'bar' } });
     await vi.runAllTimersAsync();
@@ -633,7 +634,6 @@ describe('deleteSessionProperty', () => {
         {
           "bar": true,
           "foo": "bar",
-          "zax": true,
         },
         {
           "properties": {
@@ -682,7 +682,7 @@ describe('reset', () => {
       name: 'bar',
     });
 
-    const tracker = createTracker([fooProvider, barProvider]);
+    const tracker = createTracker(() => [fooProvider, barProvider]);
     tracker.reset();
 
     await vi.runAllTimersAsync();
@@ -700,7 +700,7 @@ describe('reset', () => {
       name: 'bar',
     });
 
-    const tracker = createTracker([fooProvider, barProvider]);
+    const tracker = createTracker(() => [fooProvider, barProvider]);
     tracker.reset({
       includes: { bar: true },
     });
@@ -719,7 +719,7 @@ describe('reset', () => {
       name: 'bar',
     });
 
-    const tracker = createTracker([fooProvider, barProvider]);
+    const tracker = createTracker(() => [fooProvider, barProvider]);
     tracker.reset({
       excludes: { bar: true },
     });

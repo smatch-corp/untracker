@@ -11,22 +11,22 @@ import {
 } from './interface.js';
 
 export interface TrackerOptions {
-  storage?: Storage;
-  providers: IProvider[];
+  storage?: () => Storage;
+  providers?: () => IProvider[];
 }
 
 export class Tracker implements ITracker {
-  #providers: Map<string, IProvider>;
-  #initialized: Promise<void>;
-  #storage: Storage;
+  #providers: Map<string, IProvider> = new Map();
+  #initialized: Promise<void> = Promise.resolve();
+  #storage: Storage = null as never;
 
   constructor(options: TrackerOptions) {
-    this.#storage = typeof window !== 'undefined' && options.storage
-      ? options.storage
-      : createStorage();
+    if (typeof window === 'undefined') {
+      return;
+    }
 
-    this.#providers = new Map();
-    for (const provider of options.providers) {
+    this.#storage = options.storage?.() ?? createStorage();
+    for (const provider of options.providers?.() ?? []) {
       if (this.#providers.has(provider.name)) {
         throw new Error(`Provider name "${provider.name}" is already in use. Provider names must be unique.`);
       }
@@ -110,65 +110,68 @@ export class Tracker implements ITracker {
   deleteSessionProperty = async (key: string) => {
     const sessionProperties = await this.getSessionProperties();
 
-    return this.setSessionProperties(Object.fromEntries(
-      Object.entries(sessionProperties).filter(([$key]) => $key !== key),
-    ));
+    return this.#storage.setItem(
+      'sessionProperties',
+      Object.fromEntries(
+        Object.entries(sessionProperties).filter(([$key]) => $key !== key),
+      ),
+    );
   };
 
   clearSessionProperties = () => {
     return this.#storage.removeItem('sessionProperties');
   };
 
-  track = <
+  track = async <
     EventName extends string = string,
     EventProperties extends Record<string, any> = {},
     SessionProperties extends Record<string, any> = {},
   >(eventName: EventName, options: TrackOptions<EventProperties, SessionProperties> = {}) => {
-    this.#initialized.then(async () => {
-      const trackers = this.filterProviders(options);
+    await this.#initialized;
 
-      if (options.sessionProperties) {
-        await this.setSessionProperties(options.sessionProperties);
-      }
+    const trackers = this.filterProviders(options);
 
-      const eventProperties = await this.getEventProperties(options);
+    if (options.sessionProperties) {
+      await this.setSessionProperties(options.sessionProperties);
+    }
 
-      trackers.forEach(provider => {
-        provider.onTrack?.(eventName, { ...eventProperties }, options, {});
-      });
+    const eventProperties = await this.getEventProperties(options);
+
+    trackers.forEach(provider => {
+      provider.onTrack?.(eventName, { ...eventProperties }, options, {});
     });
   };
 
-  identify = (id: string, options: IdentifyOptions = {}) => {
-    this.#initialized.then(() => {
-      const trackers = this.filterProviders(options);
+  identify = async (id: string, options: IdentifyOptions = {}) => {
+    await this.#initialized;
 
-      trackers.forEach(provider => {
-        provider.onIdentify?.(id, options, {});
-      });
+    const trackers = this.filterProviders(options);
+
+    trackers.forEach(provider => {
+      provider.onIdentify?.(id, options, {});
     });
   };
 
-  updateUserProperties = <UserProperties extends Record<string, any> = {}>(
+  updateUserProperties = async <UserProperties extends Record<string, any> = {}>(
     userProperties: UserProperties,
     options: UpdateUserPropertiesOptions = {},
   ) => {
-    this.#initialized.then(() => {
-      const trackers = this.filterProviders(options);
+    await this.#initialized;
 
-      trackers.forEach(provider => {
-        provider.onUpdateUserProperties?.({ ...userProperties }, options, {});
-      });
+    const trackers = this.filterProviders(options);
+
+    trackers.forEach(provider => {
+      provider.onUpdateUserProperties?.({ ...userProperties }, options, {});
     });
   };
 
-  reset = (options: ResetOptions = {}) => {
-    this.#initialized.then(() => {
-      const trackers = this.filterProviders(options);
+  reset = async (options: ResetOptions = {}) => {
+    await this.#initialized;
 
-      trackers.forEach(provider => {
-        provider.onReset?.();
-      });
+    const trackers = this.filterProviders(options);
+
+    trackers.forEach(provider => {
+      provider.onReset?.();
     });
   };
 }
