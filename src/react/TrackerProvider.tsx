@@ -27,49 +27,49 @@ export const TrackerProvider: FC<TrackerProviderProps> = ({ children, ...props }
       clearSessionProperties: async (...args: Parameters<ITracker['clearSessionProperties']>) => {
         const $tracker = trackerRef.current;
 
-        isTrackerLoaded($tracker)
+        return isTrackerLoaded($tracker)
           ? $tracker.clearSessionProperties(...args)
           : enqueueTrackerTask('clearSessionProperties', args);
       },
       deleteSessionProperty: async (...args: Parameters<ITracker['deleteSessionProperty']>) => {
         const $tracker = trackerRef.current;
 
-        isTrackerLoaded($tracker)
+        return isTrackerLoaded($tracker)
           ? $tracker.deleteSessionProperty(...args)
           : enqueueTrackerTask('deleteSessionProperty', args);
       },
       identify: async (...args: Parameters<ITracker['identify']>) => {
         const $tracker = trackerRef.current;
 
-        isTrackerLoaded($tracker)
+        return isTrackerLoaded($tracker)
           ? $tracker.identify(...args)
           : enqueueTrackerTask('identify', args);
       },
       reset: async (...args: Parameters<ITracker['reset']>) => {
         const $tracker = trackerRef.current;
 
-        isTrackerLoaded($tracker)
+        return isTrackerLoaded($tracker)
           ? $tracker.reset(...args)
           : enqueueTrackerTask('reset', args);
       },
       setSessionProperties: async (...args: Parameters<ITracker['setSessionProperties']>) => {
         const $tracker = trackerRef.current;
 
-        isTrackerLoaded($tracker)
+        return isTrackerLoaded($tracker)
           ? $tracker.setSessionProperties(...args)
           : enqueueTrackerTask('setSessionProperties', args);
       },
       track: async (...args: Parameters<ITracker['track']>) => {
         const $tracker = trackerRef.current;
 
-        isTrackerLoaded($tracker)
+        return isTrackerLoaded($tracker)
           ? $tracker.track(...args)
           : enqueueTrackerTask('track', args);
       },
       updateUserProperties: async (...args: Parameters<ITracker['updateUserProperties']>) => {
         const $tracker = trackerRef.current;
 
-        isTrackerLoaded($tracker)
+        return isTrackerLoaded($tracker)
           ? $tracker.updateUserProperties(...args)
           : enqueueTrackerTask('updateUserProperties', args);
       },
