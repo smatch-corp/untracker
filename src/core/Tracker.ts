@@ -86,8 +86,8 @@ export class Tracker implements ITracker {
     return providers;
   }
 
-  private getSessionProperties = async () => {
-    return await this.#storage.getItem('sessionProperties') as object;
+  getSessionProperties = async () => {
+    return this.#storage.getItem('sessionProperties') as object;
   };
 
   private getEventProperties = async <

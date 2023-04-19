@@ -78,4 +78,6 @@ export interface ITracker {
   deleteSessionProperty: (key: string) => Promise<void>;
 
   clearSessionProperties: () => Promise<void>;
+
+  getSessionProperties: () => Promise<Record<string, any>>;
 }
