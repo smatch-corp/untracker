@@ -73,6 +73,13 @@ export const TrackerProvider: FC<TrackerProviderProps> = ({ children, ...props }
           ? $tracker.updateUserProperties(...args)
           : enqueueTrackerTask('updateUserProperties', args);
       },
+      getSessionProperties: (...args: Parameters<ITracker['getSessionProperties']>) => {
+        const $tracker = trackerRef.current;
+
+        return isTrackerLoaded($tracker)
+          ? $tracker.getSessionProperties(...args)
+          : enqueueTrackerTask('getSessionProperties', args);
+      },
     } as ITracker;
 
     function enqueueTrackerTask(methodName: keyof ITracker, args: any[] = []) {
